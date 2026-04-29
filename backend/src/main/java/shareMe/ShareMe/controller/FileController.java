@@ -108,8 +108,12 @@ public class FileController {
             file.delete();
             return "Deleted";
         }
-
         return "File not found";
+    }
+
+    @GetMapping("/test")
+    public String testt(){
+        return "after deploy";
     }
 
 }
