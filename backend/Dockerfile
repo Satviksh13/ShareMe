@@ -7,13 +7,12 @@ COPY . .
 RUN mvn clean package -DskipTests
 
 # Stage 2: Run the app
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17-jdk-jammy
 
 WORKDIR /app
 
 COPY --from=build /app/target/*.jar app.jar
 
-# Render provides PORT, default to 8080 locally
 ENV PORT=8080
 
 EXPOSE 8080
