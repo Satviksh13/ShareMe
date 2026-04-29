@@ -2,7 +2,11 @@
 FROM maven:3.9.6-eclipse-temurin-17 AS build
 
 WORKDIR /app
+
 COPY . .
+
+# Move into backend where pom.xml exists
+WORKDIR /app/backend
 
 RUN mvn clean package -DskipTests
 
@@ -11,7 +15,8 @@ FROM eclipse-temurin:17-jdk-jammy
 
 WORKDIR /app
 
-COPY --from=build /app/target/*.jar app.jar
+# Copy JAR from backend/target
+COPY --from=build /app/backend/target/*.jar app.jar
 
 ENV PORT=8080
 
