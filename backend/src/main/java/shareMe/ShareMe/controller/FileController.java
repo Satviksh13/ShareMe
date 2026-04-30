@@ -1,5 +1,6 @@
 package shareMe.ShareMe.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import shareMe.ShareMe.model.FileInfo;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
@@ -87,17 +88,30 @@ public class FileController {
     }
 
     @GetMapping(value = "/qr", produces = MediaType.IMAGE_PNG_VALUE)
-    public byte[] generateQR() throws Exception {
+    public byte[] generateQR(HttpServletRequest request) throws Exception {
 
-        String url = getServerUrl();
+        String baseUrl = getBaseUrl(request);
 
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
-        BitMatrix matrix = qrCodeWriter.encode(url, BarcodeFormat.QR_CODE, 250, 250);
+        BitMatrix matrix = qrCodeWriter.encode(baseUrl, BarcodeFormat.QR_CODE, 250, 250);
 
         ByteArrayOutputStream pngOutputStream = new ByteArrayOutputStream();
         MatrixToImageWriter.writeToStream(matrix, "PNG", pngOutputStream);
 
         return pngOutputStream.toByteArray();
+    }
+
+    private String getBaseUrl(HttpServletRequest request) {
+        String scheme = request.getScheme(); // http / https
+        String serverName = request.getServerName(); // domain or IP
+        int port = request.getServerPort();
+
+        // Avoid adding port for standard ports
+        if ((scheme.equals("http") && port == 80) || (scheme.equals("https") && port == 443)) {
+            return scheme + "://" + serverName;
+        }
+
+        return scheme + "://" + serverName + ":" + port;
     }
 
     @DeleteMapping("/delete/{filename:.+}")
